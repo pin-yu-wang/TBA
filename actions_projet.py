@@ -21,7 +21,7 @@ class Actions:
     def go(game, list_of_words, number_of_parameters):
         """
         Move the player in the direction specified by the parameter.
-        The parameter must be a cardinal direction (N, E, S, O).
+        The parameter must be a cardinal direction (N, E, S, O) + (U,D).
 
         Args:
             game (Game): The game object.
@@ -56,8 +56,60 @@ class Actions:
         # Get the direction from the list of words.
         direction = list_of_words[1]
         # Move the player in the direction specified by the parameter.
-        player.move(direction)
+        S = ["N","Nord","NORD","n","nord","S","Sud","sud","SUD","s","O","Ouest","OUEST","ouest","o","E","Est","EST","e","est","U","Up","UP","u","up","D","DOWN","d","down","Down" ]
+        if (list_of_words[1] not in S):
+            print("La commande n'existe pas.")
+
+        elif (direction in ("N","Nord","NORD","n","nord")):
+            player.move("N")
+        elif (direction in ("S","Sud","sud","SUD","s")):
+            player.move("S")
+        elif (direction in ("O","Ouest","OUEST","ouest","o")):
+            player.move("O")
+        elif (direction in ("E","Est","EST","e","est")):
+            player.move("E")
+        elif (direction in ("U","Up","UP","u","up")):
+            player.move("U")
+        elif (direction in ("D","DOWN","d","down","Down")):
+            player.move("D")
+
         return True
+
+    def back(game, list_of_words, number_of_parameters):
+        """
+        Go back to the previous room.
+
+        Args:
+            game (Game): The game object.
+            list_of_words (list): The list of words in the command.
+            number_of_parameters (int): The number of parameters expected by the command.
+
+        Returns:
+            bool: True if the command was executed successfully, False otherwise.
+        """
+        l = len(list_of_words)
+        # If the number of parameters is incorrect, print an error message and return False.
+        if l != number_of_parameters + 1:
+            command_word = list_of_words[0]
+            print(MSG0.format(command_word=command_word))
+            return False
+        
+        player = game.player
+        previous_room_name = player.go_back()
+        
+        if previous_room_name is None:
+            print("\nVous êtes à la première pièce, impossible de revenir en arrière !\n")
+            return False
+        
+        # Trouver la pièce précédente dans la liste des salles
+        for room in game.rooms:
+            if room.name == previous_room_name:
+                player.current_room = room
+                print(player.get_history_string())
+                print(player.current_room.get_long_description())
+                return True
+        
+        return False
 
     def quit(game, list_of_words, number_of_parameters):
         """
@@ -361,6 +413,37 @@ class Actions:
             return
         else:
             print("Il vous manque un objet précis pour sortir de ce manoir hanté.....va chercher ailleurs 👻 ")
+
+    def history(game, list_of_words, number_of_parameters):
+        """
+        Display the list of all visited rooms.
+
+        Args:
+            game (Game): The game object.
+            list_of_words (list): The list of words in the command.
+            number_of_parameters (int): The number of parameters expected by the command.
+
+        Returns:
+            bool: True if the command was executed successfully, False otherwise.
+        """
+        l = len(list_of_words)
+        # If the number of parameters is incorrect, print an error message and return False.
+        if l != number_of_parameters + 1:
+            command_word = list_of_words[0]
+            print(MSG0.format(command_word=command_word))
+            return False
+        
+        # Get the history of visited rooms from the player
+        visited_rooms = game.player.get_history()
+        
+        print("\nPièces visitées :")
+        if not visited_rooms:
+            print("  Aucune pièce visitée pour le moment.")
+        else:
+            for i, room in enumerate(visited_rooms, 1):
+                print(f"  {i}. {room}")
+        print()
+        return True
 
 
 
