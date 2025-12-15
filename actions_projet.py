@@ -15,6 +15,7 @@
 MSG0 = "\nLa commande '{command_word}' ne prend pas de paramètre.\n"
 # The MSG1 variable is used when the command takes 1 parameter.
 MSG1 = "\nLa commande '{command_word}' prend 1 seul paramètre.\n"
+from item import Item
 
 class Actions:
 
@@ -190,20 +191,23 @@ class Actions:
         print()
         return True
     
-    def show_inventory(game, words, nb):
+    def get_inventory(game, words, nb):
         inventory = game.player.inventory
 
-        print("\nVotre inventaire :")
+        print("\nVous disposez des items suivants :")
 
         if not inventory:
-            print("  (vide)")
+            print("Votre inventaire est vide.")
         else:
-            for obj in inventory:
-                print(f"  - {obj}")
+            for item in inventory:
+                print(f"  -{item}")
 
     def add_to_inventory(game, item):
-        game.player.inventory.append(item)
-        print(f"\n📦 Vous obtenez : {item}")
+        inventory = game.player.inventory
+
+        inventory[item.name] = item
+        #game.player.inventory.append(item)
+        print(f"\n📦 Vous obtenez : {item.name}")
 
     
 
@@ -222,7 +226,7 @@ class Actions:
 
         if reponse == reponse_attendue:
             print("\n🎉 Une des pierres ressort du mur et qui se casse en tombant, à l'intérieur, il se trouve une carte ' 2 de carreau '.")
-            Actions.add_to_inventory(game, "2 de carreau")
+            Actions.add_to_inventory(game, Item("2 de carreau", "une carte du jeu", 0.01))
             return True
         else:
             print("\n❌ Il ne s'est rien passé.")
@@ -237,7 +241,7 @@ class Actions:
 
         if reponse == reponse_attendue:
             print("\n🎉 L'enceinte du piano s'ouvre, à l'intérieur se trouve la carte ' 8 de trèfle '.")
-            Actions.add_to_inventory(game, "8 de trèfle")
+            Actions.add_to_inventory(game, Item("8 de trèfle", "une carte du jeu", 0.01))
             return True
         else:
             print("\n❌ Il ne s'est rien passé.")
@@ -270,19 +274,20 @@ class Actions:
 
         print(texte)
 
-    def inspecter_doudou(game):
-        texte = (
-        "Peut être qu'un doudou pourrait plaire à un enfant......"
-        )
-        print(texte)
-        Actions.add_to_inventory(game, "un doudou")
+    #def inspecter_doudou(game):
+        #texte = (
+        #"Peut être qu'un doudou pourrait plaire à un enfant......"
+        #)
+        #print(texte)
+        #Actions.add_to_inventory(game, Item("doudou", "un doudou avec une apparence de licorne en couleur rose", 0.4))
 
-    def inspecter_ps5(game):
-        texte = (
-        "Peut être qu'un ps5 pourrait plaire à un enfant......"
-        )
-        print(texte)
-        Actions.add_to_inventory(game, "un ps5")
+    #def inspecter_ps5(game):
+        #texte = (
+        #"Peut être qu'un ps5 pourrait plaire à un enfant......"
+        #)
+        #print(texte)
+        #Actions.add_to_inventory(game, Item("un ps5", "une console de jeu", 5))
+
 
 
     def ouvre_coffre(game):
@@ -299,9 +304,9 @@ class Actions:
         reponse = input("\nVotre réponse : ").lower().strip()
 
         if reponse == reponse_attendue:
-            print("\n🎉 Le coffre s'ouvre, il se trouve une carte ' roi de cœur ' et une loupe.")
-            Actions.add_to_inventory(game, "roi de cœur")
-            Actions.add_to_inventory(game, "une loupe")
+            print("\n🎉 Le coffre s'ouvre, il se trouve une carte ' roi de coeur ' et une loupe.")
+            Actions.add_to_inventory(game, Item("roi de coeur", "une carte de jeu ", 0.01))
+            Actions.add_to_inventory(game, Item("une loupe", "un outil pour zoomer ", 0.2))
             return True
         else:
             print("\n❌ Le code n'est pas bon, le coffre reste bloqué.")
@@ -312,7 +317,7 @@ class Actions:
 
         inventory = game.player.inventory
 
-        bijou = "bijou ancien"
+        bijou = "bijou"
         carte_donnee = "as de pique"
 
         # Vérifier si le joueur a déjà la carte
@@ -328,7 +333,7 @@ class Actions:
             inventory.remove(bijou)  # Il donne le bijou
             print("Vous recevez : As de pique.")
 
-            Actions.add_to_inventory(game,carte_donnee)  # Elle donne la carte
+            Actions.add_to_inventory(game, Item(carte_donnee, "une carte de jeu ", 0.01)) # Elle donne la carte
         else:
             print("Elle secoue la tête : « Je n’ai rien pour vous tant que vous ne m'apportez pas quelque chose de précieux… »")
     
@@ -338,23 +343,22 @@ class Actions:
 
         inventory = game.player.inventory
 
-        doudou_donne = "un doudou"
-        bijou = "bijou ancien"
+        doudou_donne = "doudou"
+        bijou = "bijou"
 
         # Vérifier si le joueur a deja le bijou
         if bijou in inventory:
             print("\nL'enfant rigole en disant : « Vous me prenez pour une source infinie ? »")
             return
-
         # Vérifier si le joueur possède le doudou
-        if doudou_donne in inventory:
+        if doudou_donne in game.player.inventory:
             print("« Oooh ! Mon jouet préféré !! »")
             print("Il échange le doudou contre le bijou")
 
-            game.player.inventory.remove(doudou_donne)  # on lui donne le doudou
-            print("Vous recevez : Un bijou ancien.")
+            del game.player.inventory[doudou_donne]  # on lui donne le doudou
+            print("Vous recevez : Un bijou")
 
-            Actions.add_to_inventory(game, bijou)  # Il donne le bijou
+            Actions.add_to_inventory(game, Item(bijou, "un accessoire précieux ", 5))    # Il donne le bijou
         else:
             print("Enfant retourne se coucher dans le lit.")
 
@@ -387,7 +391,7 @@ class Actions:
 
     def coffre_clé(game):
         print("\nCeci est un coffre maître, il est indiqué de gauche à droit les couleurs suivantes :")
-        print("\ncœur, pique, carreau, trèfle")
+        print("\ncoeur, pique, carreau, trèfle")
 
         reponse_attendue = "roi as 2 8"
 
@@ -396,7 +400,7 @@ class Actions:
 
         if reponse == reponse_attendue:
             print("\n🎉Bien joué ! Vous arrivez bientôt à la fin !")
-            Actions.add_to_inventory(game, "clé maître")
+            Actions.add_to_inventory(game, Item("clé maître", "un outil essentiel pour sortir du manoir", 2))
             return True
         else:
             print("\n❌ Le coffre reste bloqué...")
@@ -444,6 +448,68 @@ class Actions:
                 print(f"  {i}. {room}")
         print()
         return True
+    
+    def look(game, words, nb):
+        room = game.player.current_room
+        room.get_inventory()
+
+    def take(game, words, nb):
+        #S = ["doudou", "ps5"]
+        #if words[1] not in S:
+            #print("\nCe n'est pas un objet, impossible de le ramasser.")
+            #return
+        if len(words) < 2:
+            print("Prendre quoi ?")
+            return
+        
+        item_name = " ".join(words[1:]).lower()
+        current_room = game.player.current_room
+
+
+        # Vérifier si l'objet est dans l'inventaire de la pièce
+        if item_name not in current_room.inventory:
+            print("Vous ne possédez pas cet objet.")
+            return
+
+        item = current_room.inventory[item_name]
+
+        poids_actuel = game.player.get_current_weight()
+        if poids_actuel + item.weight > game.player.max_weight:
+            print("Cet objet est trop lourd, impoossible de le ramasser.")
+            return
+
+        Actions.add_to_inventory(game, item)
+        del current_room.inventory[item_name]  # Retirer l'objet de la pièce
+        print(f"Vous avez pris l'objet '{item_name}'.")
+            
+
+    def drop(game, words, nb):
+        if len(words) < 2:
+            print("Déposer quoi ?")
+            return
+        
+        item_name = " ".join(words[1:]).lower()
+        player = game.player
+        current_room = player.current_room 
+        # Vérifier si l'objet est dans l'inventaire du joueur
+        if item_name in player.inventory:   # Pour éviter de déposer un objet que le joueur n'a pas
+            item = player.inventory[item_name]  #valeur dans dictionnaire
+            current_room.inventory[item_name] = item  # Ajouter l'objet à la pièce
+            del player.inventory[item_name]  # Retirer l'objet de l'inventaire du joueur
+            print(f"\nVous avez déposé l'objet '{item.name}'")
+        else:
+            print("Vous ne possédez pas cet objet.")
+
+    def check(game, words, nb):
+        inventory = game.player.inventory
+
+        print("\n🧰 Votre inventaire contient :")
+
+        if not inventory:
+            print("Il n'y a rien dans votre inventaire.")
+        else:
+            for item in inventory.values():
+                print(f"    - {item.name} : {item.description} ({item.weight} kg)")
 
 
 

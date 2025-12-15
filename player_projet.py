@@ -5,10 +5,10 @@ class Player():
     def __init__(self, name):
         self.name = name
         self.current_room = None
-        self.inventory = []
+        self.inventory = {}
         self.history = ["Hall"]  # Liste des pièces visitées, initialisée avec la pièce de départ
-        
-    
+        self.max_weight = 5.0
+
     # Define the move method.
     def move(self, direction):
         # Get the next room from the exits dictionary of the current room.
@@ -30,15 +30,16 @@ class Player():
         return True
 
         
-
     def get_history(self):
         # retourne une liste des pièces déjà visitées
         return self.history
     
+
     def get_history_string(self):
         # retourne une chaîne comme : "Historique : Cuisine -> Laboratoire -> Couloir"
         return "Historique : " + " -> ".join(self.history)
     
+
     def go_back(self):
         # retourne à la pièce précédente si possible
         if len(self.history) > 1:
@@ -46,4 +47,11 @@ class Player():
             previous_room_name = self.history[-1]
             return previous_room_name
         return None
+    
+    def get_current_weight(self):
+        total_weight = 0.0
+        for item in self.inventory.values():
+            total_weight += item.weight
+        return total_weight
+
         

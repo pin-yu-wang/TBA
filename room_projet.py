@@ -8,6 +8,7 @@ class Room:
         self.description = description
         self.exits = {}
         self.interactions = {}   # <-- Dictionnaire des objets interactifs
+        self.inventory = {}
     
     # Define the get_exit method.
     def get_exit(self, direction):
@@ -30,3 +31,11 @@ class Room:
     # Return a long description of this room including exits.
     def get_long_description(self):
         return f"\nVous êtes {self.description}\n\n{self.get_exit_string()}\n"
+    
+    def get_inventory(self):
+        if not self.inventory:
+            print("\nIl n'y a rien ici.")
+        else:
+            print("\nOn voit :")
+            for item in self.inventory.values():
+                print(f"    - {item.name} : {item.description} ({item.weight} kg)")

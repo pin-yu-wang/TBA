@@ -6,6 +6,8 @@ from room_projet import Room
 from player_projet import Player
 from command_projet import Command
 from actions_projet import Actions
+from item import Item
+
 
 
 class Game:
@@ -15,6 +17,7 @@ class Game:
         self.rooms = []
         self.commands = {}
         self.player = None
+        self.item = []
  
    
 
@@ -31,13 +34,20 @@ class Game:
         self.commands["go"] = go
         inspect = Command("inspect", " <objet> : inspecter un élément dans la pièce", Actions.inspect, 1)
         self.commands["inspect"] = inspect
-        inventory = Command("inventory", " : afficher l'inventaire", Actions.show_inventory, 0)
+        inventory = Command("inventory", " : afficher l'inventaire", Actions.get_inventory, 0)
         self.commands["inventory"] = inventory
         history = Command("history", " : afficher la liste des pièces visitées", Actions.history, 0)
         self.commands["history"] = history
         back = Command("back", " : revenir à la pièce précédente", Actions.back, 0)
         self.commands["back"] = back
-
+        look = Command("look", " : regarder autour de soi pour voir les objets dans la pièce", Actions.look, 0)
+        self.commands["look"] = look
+        take = Command("take", " <objet> : prendre un objet dans la pièce", Actions.take, 1)
+        self.commands["take"] = take
+        drop = Command("drop", " <objet> : déposer un objet de l'inventaire dans la pièce", Actions.drop, 1)
+        self.commands["drop"] = drop
+        check = Command("check", " <objet> : vérifier un objet de l'inventaire", Actions.check, 1)
+        self.commands["check"]= check
 
         # Setup rooms
 
@@ -60,25 +70,47 @@ class Game:
         self.rooms.append(Cuisine)
 
 
-        Bibliothèque.interactions = {"mur": Actions.enigme_maths,
-                                    "grimoire": Actions.inspecter_grimoire,
-                                    "doudou": Actions.inspecter_doudou}
 
-        Bureau.interactions = {"tableau": Actions.inspecter_tableau,
-                               "coffre" : Actions.coffre_clé,
-                               "porte": Actions.ouvre_porte}
+        # Setup interactions and inventories for rooms
+
+        Bibliothèque.interactions = {"mur": Actions.enigme_maths,
+                                    "grimoire": Actions.inspecter_grimoire}
+                                    #"doudou": Actions.inspecter_doudou}
+        Bibliothèque.inventory = {"doudou": Item("doudou", "un jouet en peluche", 0.5),
+                                "grimoire": Item("grimoire", "un vieux livre poussiéreux rempli de formules mathématiques", 6),
+                                "mur" : Item("mur", "un mur avec des inscriptions mystérieuses", 50)}
+        
+
+        Bureau.interactions = {"tableau": Actions.inspecter_tableau}
+        Bureau.inventory = {"tableau": Item("tableau", "un tableau ancien représentant un paysage sombre", 20)}
+
 
         Chambre.interactions = {"coffre": Actions.ouvre_coffre,
                                 "enfant": Actions.inspecter_enfant}
+        Chambre.inventory = {"coffre": Item("coffre", "un coffre en bois massif avec un verrou complexe", 20),
+                             "enfant": Item("enfant", "un petit garçon aux yeux tristes", 30)}
 
-        Salle_de_musique.interactions = {"ps5": Actions.inspecter_ps5,
-                                        "piano": Actions.inspecter_piano}
+
+        Salle_de_musique.interactions = {"piano": Actions.inspecter_piano}
+                                        #"ps5": Actions.inspecter_ps5,      
+        Salle_de_musique.inventory = {"ps5": Item("ps5", "une console de jeu", 4),
+                                      "piano": Item("piano", "un vieux piano à queue", 150)}
+
 
         Salon.interactions = {"femme": Actions.femme}
+        Salon.inventory = {"femme": Item("femme", "une silhouette féminine vêtue d'une robe blanche flottante", 60)}
+
+        Cuisine.interactions = {"coffre maître" : Actions.coffre_clé}
+        Cuisine.inventory = {"coffre maître": Item("coffre maître", "un coffre robuste nécessitant une clé spéciale", 30)}
+
+
+        Laboratoire.interactions = {"porte": Actions.ouvre_porte}
+        Laboratoire.inventory = {"porte": Item("porte","une porte verrouillée menant à la sortie", 50)} 
+
 
 
         # Create exits for rooms
-        #1er étage
+        # 1er étage
 
         Bibliothèque.exits = {"N" : None, "E" : None, "S" : Laboratoire, "O" : Salle_de_musique, "U": None, "D": Laboratoire}
         Chambre.exits = {"N" : Salle_de_musique, "E" : None, "S" : None, "O" : None, "U": None, "D": Hall}
@@ -86,7 +118,7 @@ class Game:
         Laboratoire.exits = {"N" : Bibliothèque, "E" : None, "S" : None, "O" : Chambre,"U":None, "D": None}
 
 
-        #rez_de_chaussé
+        # rez_de_chaussé
         Hall.exits = {"N" : Bureau, "E" : Cuisine, "S" : None, "O" : None, "U": Chambre, "D":None}
         Salon.exits = {"N" : None, "E" : None, "S" : Cuisine, "O" : Bureau, "U": Bibliothèque, "D": None}
         Bureau.exits = {"N" : None, "E" : Salon, "S" : None, "O" : None,"U":None, "D": None}
