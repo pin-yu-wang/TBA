@@ -518,11 +518,8 @@ class Actions:
         current_room = game.player.current_room
 
         # Vérifier si le personnage est dans la pièce
-        if character_name not in current_room.characters:
-            print("Cette personne n'est pas présente dans la pièce.")
-            return
-
-        else : 
+        if character_name in current_room.characters:
             character = current_room.characters[character_name]
             character.get_msg()
-
+        else:
+            print("Il n'y a personne de ce nom ici.")

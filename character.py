@@ -43,10 +43,9 @@ class Character():
 
     
     def get_msg(self):
-        list1 = self.msgs
-        if list1:
-            msg = list1.pop(0)
+        if self.msgs:
+            msg = self.msgs.pop(0)
             print(f"{self.name} dit : \"{msg}\"")
         else:
-            print(f"{self.name} dit : \"{self.msgs}\"")
+            print(f"{self.name} dit : \"Je n'ai plus rien à dire.\"")
         

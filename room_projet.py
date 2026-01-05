@@ -42,5 +42,4 @@ class Room:
         for item in self.inventory.values():
             print(f"    - {item.name} : {item.description} ({item.weight} kg)")
         for character in self.characters.values():
-            print(f"    - {character.name} : {character.description}\n"
-                  f"    « {character.msgs[0]}  »")
+            print(f"    - {character.name} : {character.description}\n")
