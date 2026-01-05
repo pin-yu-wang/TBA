@@ -1,14 +1,16 @@
 # Define the Room class.
-
+from config import DEBUG
 class Room:
 
     # Define the constructor. 
-    def __init__(self, name, description):
+    def __init__(self, name, description, character):
         self.name = name
         self.description = description
+        # Exits doivent être un dictionnaire de directions -> Room
         self.exits = {}
         self.interactions = {}   # <-- Dictionnaire des objets interactifs
-        self.inventory = {}
+        self.inventory = {}     # objets
+        self.characters =  {}        #PNJ
     
     # Define the get_exit method.
     def get_exit(self, direction):
@@ -33,9 +35,12 @@ class Room:
         return f"\nVous êtes {self.description}\n\n{self.get_exit_string()}\n"
     
     def get_inventory(self):
-        if not self.inventory:
+        if not self.inventory and not self.characters:
             print("\nIl n'y a rien ici.")
-        else:
-            print("\nOn voit :")
-            for item in self.inventory.values():
-                print(f"    - {item.name} : {item.description} ({item.weight} kg)")
+            return
+        print("\nOn voit :")
+        for item in self.inventory.values():
+            print(f"    - {item.name} : {item.description} ({item.weight} kg)")
+        for character in self.characters.values():
+            print(f"    - {character.name} : {character.description}\n"
+                  f"    « {character.msgs[0]}  »")

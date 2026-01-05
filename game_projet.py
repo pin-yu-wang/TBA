@@ -7,8 +7,9 @@ from player_projet import Player
 from command_projet import Command
 from actions_projet import Actions
 from item import Item
-
-
+from character import Character
+from config import DEBUG
+from game import Game
 
 class Game:
     # Constructor
@@ -18,8 +19,24 @@ class Game:
         self.commands = {}
         self.player = None
         self.item = []
- 
-   
+
+    def game_turn(self):
+        # Assurer qu'un PNJ ne bouge qu'une seule fois par tour :
+        seen_ids = set()
+        for room in self.rooms:
+            for character in list(room.characters.values()):
+                # Ignorer si déjà traité ce tour
+                if id(character) in seen_ids:
+                    continue
+                seen_ids.add(id(character))
+
+                moved = character.move()
+
+                if DEBUG:
+                    if moved:
+                        print(f"[DEBUG] → {character.name} a changé de pièce.")
+                    else:
+                        print(f"[DEBUG] → {character.name} n'a pas bougé.")
 
     # Setup the game
     def setup(self):
@@ -48,49 +65,53 @@ class Game:
         self.commands["drop"] = drop
         check = Command("check", " <objet> : vérifier un objet de l'inventaire", Actions.check, 1)
         self.commands["check"]= check
+        talk = Command("talk", " <personnage> : parler à un personnage dans la pièce", Actions.talk, 1)
+        self.commands["talk"]= talk
 
         # Setup rooms
 
-        Hall = Room("Hall", "actuellement dans le Hall, il y a une lettre posée sur la table écrivant 'Boooooh 👻👻👻, vous êtes dans un manoir hanté qui a été fondé en 1879. Si vous ne sortez pas par la porte de sortie qui se trouve quelque part dans ce manoir à temps, vous resterez prisonnier à jamais....... Je vous souhaite bon courage ! \n\nOn constate qu'il y a des ecaliers qui mènent vers un étage supérieur..")
+        Hall = Room("Hall", "actuellement dans le Hall, on constate qu'il y a des ecaliers qui mènent vers un étage supérieur.", None)
         self.rooms.append(Hall)
-        Salon = Room("Salon", "dans le Salon, plongé dans une pénombre frissonnante, était rempli de meubles anciens recouverts de draps poussiéreux. On constate la présence d'une femme et une échelle à côté d'elle qui mène vers l'étage au-dessus.")
+        Salon = Room("Salon", "dans le Salon, plongé dans une pénombre frissonnante, était rempli de meubles anciens recouverts de draps poussiéreux. On constate la présence d'une femme et une échelle à côté d'elle qui mène vers l'étage au-dessus.", "femme")
         self.rooms.append(Salon)
-        Bibliothèque = Room("Bibliothèque", "dans la Bibliothèque, saturée d'un parfum de vieux parchemin, alignait ses étagères grinçantes dans une obscurité inquiétante. On observe un grimoire et un doudou au sol, et un mur gravé d'un langage ancien. Il y a une échelle qui vous mène vers l'étage en-dessous.")
+        Bibliothèque = Room("Bibliothèque", "dans la Bibliothèque, saturée d'un parfum de vieux parchemin, alignait ses étagères grinçantes dans une obscurité inquiétante. On observe un grimoire et un doudou au sol, et un mur gravé d'un langage ancien. Il y a une échelle qui vous mène vers l'étage en-dessous.", None)
         self.rooms.append(Bibliothèque)
-        Chambre = Room("Chambre", "dans la Chambre, figée dans une lueur blafarde, dévoilait un lit et des rideaux immobiles, sous le lit, il se trouve un coffre vérrouillé, et un enfant assis sur ce dernier, dans le coin de la pièce, vous observez des escaliers qui mènent vers un étage en-dessous.")
+        Chambre = Room("Chambre", "dans la Chambre, figée dans une lueur blafarde, dévoilait un lit et des rideaux immobiles, sous le lit, il se trouve un coffre vérrouillé, et un enfant assis sur ce dernier, dans le coin de la pièce, vous observez des escaliers qui mènent vers un étage en-dessous.", "enfant")
         self.rooms.append(Chambre)
-        Salle_de_musique = Room("Salle_de_musique", "dans la Salle de musique, résonnait d'un silence oppressant, où un piano délaissé semblait attendre que les mains invisibles rejouent une mélodie oubliée, à coté du piano, il se trouve une ps5.")
+        Salle_de_musique = Room("Salle_de_musique", "dans la Salle de musique, résonnait d'un silence oppressant, où un piano délaissé semblait attendre que les mains invisibles rejouent une mélodie oubliée, à coté du piano, il se trouve une ps5.", None)
         self.rooms.append(Salle_de_musique)
-        Bureau = Room("Bureau", "dans le Bureau, encombré de papiers jaunis et d'un large secrétaire craquant, baignait dans une atmosphère lourde, il y a un tableau poussiéreux sur le mur, un coffre doré sur une table dans un coin et une porte mystérieuse en face de vous....")
+        Bureau = Room("Bureau", "dans le Bureau, encombré de papiers jaunis et d'un large secrétaire craquant, baignait dans une atmosphère lourde, il y a un tableau poussiéreux sur le mur.", None)
         self.rooms.append(Bureau)
 
-        Laboratoire = Room("Laboratoire", "dans le Laboratoire, déserté, rempli d’appareils silencieux et de fioles encore tièdes, semble figé au milieu d’une expérience interrompue. ")
+        Laboratoire = Room("Laboratoire", "dans le Laboratoire, déserté, rempli d’appareils silencieux et de fioles encore tièdes, semble figé au milieu d’une expérience interrompue. Il y a une porte verrouillée......", None)
         self.rooms.append(Laboratoire)
-        Cuisine = Room("Cuisine", "dans la Cuisine, il y a des casseroles encore chaudes traînant sur le comptoir comme si quelqu’un était parti en plein milieu d’une préparation. ")
+        Cuisine = Room("Cuisine", "dans la Cuisine, il y a des casseroles encore chaudes traînant sur le comptoir comme si quelqu’un était parti en plein milieu d’une préparation. En dessous de l’évier, un coffre maître robuste attire votre attention.", None)
         self.rooms.append(Cuisine)
 
 
 
         # Setup interactions and inventories for rooms
+        Hall.inventory = {"lettre": Item("lettre", "une lettre ancienne", 0.03),
+                          "farine":Item("farine", "un sac de farine de qualité", 1)}
+
 
         Bibliothèque.interactions = {"mur": Actions.enigme_maths,
                                     "grimoire": Actions.inspecter_grimoire}
                                     #"doudou": Actions.inspecter_doudou}
         Bibliothèque.inventory = {"doudou": Item("doudou", "un jouet en peluche", 0.5),
-                                "grimoire": Item("grimoire", "un vieux livre poussiéreux rempli de formules mathématiques", 6),
-                                "mur" : Item("mur", "un mur avec des inscriptions mystérieuses", 50)}
+                                "grimoire": Item("grimoire", "un vieux livre poussiéreux rempli de formules mathématiques", 11),
+                                "mur" : Item("mur", "un mur avec des inscriptions mystérieuses", 900)}
         
 
         Bureau.interactions = {"tableau": Actions.inspecter_tableau}
-        Bureau.inventory = {"tableau": Item("tableau", "un tableau ancien représentant un paysage sombre", 20)}
+        Bureau.inventory = {"tableau": Item("tableau", "un tableau ancien représentant un paysage sombre", 20),
+                            "beurre": Item("beurre", "un petit morceau de beurre demi-sel", 0.05)}
 
 
-        Chambre.interactions = {"coffre": Actions.ouvre_coffre,
-                                "enfant": Actions.inspecter_enfant}
-        Chambre.inventory = {"coffre": Item("coffre", "un coffre en bois massif avec un verrou complexe", 20),
-                             "enfant": Item("enfant", "un petit garçon aux yeux tristes", 30)}
-
-
+        Chambre.interactions = {"coffre": Actions.ouvre_coffre}
+        Chambre.inventory = {"coffre": Item("coffre", "un coffre en bois massif avec un verrou complexe", 20)}
+        Chambre.characters = {"enfant": Character("enfant"," un petit garçon aux yeux tristes", Chambre, ["Je m'ennuie tout seul ici", "Voulez-vous jouer avec moi ?"])}
+        
         Salle_de_musique.interactions = {"piano": Actions.inspecter_piano}
                                         #"ps5": Actions.inspecter_ps5,      
         Salle_de_musique.inventory = {"ps5": Item("ps5", "une console de jeu", 4),
@@ -98,21 +119,24 @@ class Game:
 
 
         Salon.interactions = {"femme": Actions.femme}
-        Salon.inventory = {"femme": Item("femme", "une silhouette féminine vêtue d'une robe blanche flottante", 60)}
-
+        Salon.inventory = {"lait": Item("lait", "une petite bouteille de lait frais", 0.5)}
+        Salon.characters = {"femme": Character("femme","une silhouette féminine vêtue d'une robe blanche flottante", Salon, ["J'adore les accessoires luxueux !", "Avez-vous quelques choses de précieux à me donner?"])}
+       
         Cuisine.interactions = {"coffre maître" : Actions.coffre_clé}
-        Cuisine.inventory = {"coffre maître": Item("coffre maître", "un coffre robuste nécessitant une clé spéciale", 30)}
+        Cuisine.inventory = {"coffre maître": Item("coffre maître", "un coffre robuste nécessitant une clé spéciale", 30),
+                             "oeuf":Item("oeuf", "4 oeufs frais", 0.2)}
 
 
         Laboratoire.interactions = {"porte": Actions.ouvre_porte}
-        Laboratoire.inventory = {"porte": Item("porte","une porte verrouillée menant à la sortie", 50)} 
+        Laboratoire.inventory = {"porte": Item("porte","une porte verrouillée", 50),
+                                 "rhum ambré":Item("rhum ambré", "une bouteille de rhum ambré", 1.5)} 
 
 
 
         # Create exits for rooms
         # 1er étage
 
-        Bibliothèque.exits = {"N" : None, "E" : None, "S" : Laboratoire, "O" : Salle_de_musique, "U": None, "D": Laboratoire}
+        Bibliothèque.exits = {"N" : None, "E" : None, "S" : Laboratoire, "O" : Salle_de_musique, "U": None, "D": Salon}
         Chambre.exits = {"N" : Salle_de_musique, "E" : None, "S" : None, "O" : None, "U": None, "D": Hall}
         Salle_de_musique.exits = {"N" : None, "E" : Bibliothèque, "S" : Chambre, "O" : None, "U":None, "D": None}
         Laboratoire.exits = {"N" : Bibliothèque, "E" : None, "S" : None, "O" : Chambre,"U":None, "D": None}
@@ -139,6 +163,8 @@ class Game:
         while not self.finished:
             # Get the command from the player
             self.process_command(input("> "))
+            # After each player command, let NPCs take their turns
+            self.game_turn()
         return None
 
     # Process the command entered by the player
@@ -159,7 +185,7 @@ class Game:
 
     # Print the welcome message
     def print_welcome(self):
-        print(f"\nBienvenue {self.player.name} dans Alice In Borderland !")
+        print(f"\nBienvenue {self.player.name} dans Alice In Borderland !\n\nIl y a une lettre posée sur la table écrivant 'Boooooh 👻👻👻, vous êtes dans un manoir hanté qui a été fondé en 1879. Si vous ne sortez pas par la porte de sortie qui se trouve quelque part dans ce manoir à temps, vous resterez prisonnier à jamais....... Je vous souhaite bon courage !")
         print("Entrez 'help' si vous avez besoin d'aide.")
         #
         print(self.player.current_room.get_long_description())

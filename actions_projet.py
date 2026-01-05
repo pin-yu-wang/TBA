@@ -16,6 +16,7 @@ MSG0 = "\nLa commande '{command_word}' ne prend pas de paramètre.\n"
 # The MSG1 variable is used when the command takes 1 parameter.
 MSG1 = "\nLa commande '{command_word}' prend 1 seul paramètre.\n"
 from item import Item
+from config import DEBUG
 
 class Actions:
 
@@ -330,7 +331,8 @@ class Actions:
             print("\n« Oh ! Ce bijou... je le reconnaîtrais entre mille ! »")
             print("\nElle vous tend une carte en échange : L'as de pique !")
 
-            inventory.remove(bijou)  # Il donne le bijou
+            # Retirer le bijou de l'inventaire (inventory est un dict)
+            inventory.pop(bijou, None)
             print("Vous recevez : As de pique.")
 
             Actions.add_to_inventory(game, Item(carte_donnee, "une carte de jeu ", 0.01)) # Elle donne la carte
@@ -454,10 +456,6 @@ class Actions:
         room.get_inventory()
 
     def take(game, words, nb):
-        #S = ["doudou", "ps5"]
-        #if words[1] not in S:
-            #print("\nCe n'est pas un objet, impossible de le ramasser.")
-            #return
         if len(words) < 2:
             print("Prendre quoi ?")
             return
@@ -511,5 +509,20 @@ class Actions:
             for item in inventory.values():
                 print(f"    - {item.name} : {item.description} ({item.weight} kg)")
 
+    def talk(game, words, nb):
+        if len(words) < 2:
+            print("Parler à qui ?")
+            return
+        
+        character_name = " ".join(words[1:]).lower()
+        current_room = game.player.current_room
 
+        # Vérifier si le personnage est dans la pièce
+        if character_name not in current_room.characters:
+            print("Cette personne n'est pas présente dans la pièce.")
+            return
+
+        else : 
+            character = current_room.characters[character_name]
+            character.get_msg()
 

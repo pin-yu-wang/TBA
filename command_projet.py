@@ -1,4 +1,5 @@
 # This file contains the Command class.
+from actions_projet import Actions
 
 class Command:
     """
@@ -40,6 +41,20 @@ class Command:
     def __str__(self):
         return  self.command_word \
                 + self.help_string
-    
 
 
+def parse_command(game, command):
+    words = command.lower().split()
+    if not words:
+        return
+
+    if words[0] == "look":
+        Actions.look(game, words, len(words))
+    elif words[0] == "take":
+        Actions.take(game, words, len(words))
+    elif words[0] == "drop":
+        Actions.drop(game, words, len(words))
+    elif words[0] == "check":
+        Actions.check(game, words, len(words))
+    else:
+        print("Commande inconnue.")

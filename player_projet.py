@@ -7,7 +7,7 @@ class Player():
         self.current_room = None
         self.inventory = {}
         self.history = ["Hall"]  # Liste des pièces visitées, initialisée avec la pièce de départ
-        self.max_weight = 5.0
+        self.max_weight = 10.0
 
     # Define the move method.
     def move(self, direction):
