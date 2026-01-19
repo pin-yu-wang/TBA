@@ -9,7 +9,7 @@ from actions import Actions
 from item import Item
 from character import Character
 from config import DEBUG
-from game import Game
+#from game import Game
 
 class Game:
     # Constructor
