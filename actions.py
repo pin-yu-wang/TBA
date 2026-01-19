@@ -408,17 +408,17 @@ class Actions:
             print("\n❌ Le coffre reste bloqué...")
             return False
     
-    def ouvre_porte(game):
+    #def ouvre_porte(game):
 
-        inventory = game.player.inventory
-        clé = 'clé maître'
+        #inventory = game.player.inventory
+        #clé = 'clé maître'
 
         # Vérifier si le joueur a la clé maître
-        if clé in inventory:
-            print(f"\n🎉 Félicitation {game.player.name} ! Vous avez réussi ! La porte s'ouvre lentement....Vous êtes maintenant en liberté ! Vive le python 🐍")
-            return
-        else:
-            print("Il vous manque un objet précis pour sortir de ce manoir hanté.....va chercher ailleurs 👻 ")
+        #if clé in inventory:
+            #print(f"\n🎉 Félicitation {game.player.name} ! Vous avez réussi ! La porte s'ouvre lentement....Vous êtes maintenant en liberté ! Vive le python 🐍")
+            #return
+        #else:
+            #print("Il vous manque un objet précis pour sortir de ce manoir hanté.....va chercher ailleurs 👻 ")
 
     def history(game, list_of_words, number_of_parameters):
         """
@@ -521,6 +521,10 @@ class Actions:
         if character_name in current_room.characters:
             character = current_room.characters[character_name]
             character.get_msg()
+
+            # NOUVEAU : enregistrer que le joueur a parlé à ce PNJ
+            game.player.talk_to(character_name)
+
         else:
             print("Il n'y a personne de ce nom ici.")
 

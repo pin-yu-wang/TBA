@@ -8,6 +8,7 @@ class Player():
         self.inventory = {}
         self.history = ["Hall"]  # Liste des pièces visitées, initialisée avec la pièce de départ
         self.max_weight = 10.0
+        self.talked_to = []  # Liste des personnages déjà parlés
 
     # Define the move method.
     def move(self, direction):
@@ -54,4 +55,10 @@ class Player():
             total_weight += item.weight
         return total_weight
 
-        
+
+    def has_talked_to(self, pnj_name):
+        return pnj_name in self.talked_to
+
+    def talk_to(self, pnj_name):
+        if pnj_name not in self.talked_to:
+            self.talked_to.append(pnj_name)   
