@@ -1,5 +1,5 @@
 # This file contains the Command class.
-from actions_projet import Actions
+from actions import Actions
 
 class Command:
     """

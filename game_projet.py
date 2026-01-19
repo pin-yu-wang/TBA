@@ -2,10 +2,10 @@
 
 # Import modules
 
-from room_projet import Room
-from player_projet import Player
-from command_projet import Command
-from actions_projet import Actions
+from room import Room
+from player import Player
+from command import Command
+from actions import Actions
 from item import Item
 from character import Character
 from config import DEBUG
