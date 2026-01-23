@@ -9,7 +9,7 @@
 # The functions print an error message if the number of parameters is incorrect.
 # The error message is different depending on the number of parameters expected by the command.
 
-
+          
 # The error message is stored in the MSG0 and MSG1 variables and formatted with the command_word variable, the first word in the command.
 # The MSG0 variable is used when the command does not take any parameter.
 MSG0 = "\nLa commande '{command_word}' ne prend pas de paramètre.\n"
@@ -77,6 +77,7 @@ class Actions:
 
         return True
 
+
     def back(game, list_of_words, number_of_parameters):
         """
         Go back to the previous room.
@@ -112,6 +113,7 @@ class Actions:
                 return True
         
         return False
+
 
     def quit(game, list_of_words, number_of_parameters):
         """
@@ -151,6 +153,7 @@ class Actions:
         print(msg)
         game.finished = True
         return True
+
 
     def help(game, list_of_words, number_of_parameters):
         """
@@ -192,17 +195,7 @@ class Actions:
         print()
         return True
     
-    def get_inventory(game, words, nb):
-        inventory = game.player.inventory
-
-        print("\nVous disposez des items suivants :")
-
-        if not inventory:
-            print("Votre inventaire est vide.")
-        else:
-            for item in inventory:
-                print(f"  -{item}")
-
+    # Add an item to the player's inventory.
     def add_to_inventory(game, item):
         inventory = game.player.inventory
 
@@ -211,18 +204,16 @@ class Actions:
         print(f"\n📦 Vous obtenez : {item.name}")
 
     
-
+    # Enigme du mur
     def enigme_maths(game):
 
-        # Ici tu choisis ton énigme :
         enigme = "Le double de l'âge du manoir moins le nombre de pièce au cube" 
 
-        reponse_attendue = "76"
+        reponse_attendue = "-218"
 
         print("\nÉnigme :")
         print(enigme)
 
-        # Pose la question au joueur :
         reponse = input("\nVotre réponse : ").lower().strip()
 
         if reponse == reponse_attendue:
@@ -233,11 +224,11 @@ class Actions:
             print("\n❌ Il ne s'est rien passé.")
             return False
         
+    # enigme du piano      
     def enigme_sonore(game):
 
         reponse_attendue = "re mi do fa sol"
 
-        # Pose la question au joueur :
         reponse = input("\n🎵🎵🎵Votre réponse (en miniscule avec les espaces): ").lower().strip()
 
         if reponse == reponse_attendue:
@@ -248,6 +239,7 @@ class Actions:
             print("\n❌ Il ne s'est rien passé.")
             return False
 
+    # command inspect
     def inspect(game, words, nb):
         if len(words) < 2:
             print("Inspecter quoi ?")
@@ -258,42 +250,26 @@ class Actions:
 
         # Si l'objet est interactif dans cette pièce
         if objet in current_room.interactions:
-            current_room.interactions[objet](game)   # Appelle la fonction associée
+            current_room.interactions[objet](game)
         else:
             print("Vous ne voyez rien de spécial concernant cela.")
 
-
+    # inspecter grimoire
     def inspecter_grimoire(game):
         print("\nVous ouvrez le vieux grimoire poussiéreux...")
 
         texte = (
         "Les pages sont jaunies, mais un symbole étrange attire votre attention.\n"
-        "Au bas d'une page, vous lisez un chiffre entouré de glyphes :\n\n"
+        "Au bas d'une page, vous lisez un nombre :\n\n"
         "    → 0919\n\n"
         "Ce code semble important... peut-être ouvrira-t-il un coffre ailleurs dans le manoir."
         )
 
         print(texte)
 
-    #def inspecter_doudou(game):
-        #texte = (
-        #"Peut être qu'un doudou pourrait plaire à un enfant......"
-        #)
-        #print(texte)
-        #Actions.add_to_inventory(game, Item("doudou", "un doudou avec une apparence de licorne en couleur rose", 0.4))
-
-    #def inspecter_ps5(game):
-        #texte = (
-        #"Peut être qu'un ps5 pourrait plaire à un enfant......"
-        #)
-        #print(texte)
-        #Actions.add_to_inventory(game, Item("un ps5", "une console de jeu", 5))
-
-
-
+    # code du coffre 
     def ouvre_coffre(game):
 
-        # Ici tu choisis ton énigme :
         indice = "Le coffre étant fermé, il faut un code pour l'ouvrir..." 
 
         reponse_attendue = "0919"
@@ -301,7 +277,6 @@ class Actions:
         print("\nIndice :")
         print(indice)
 
-        # Pose la question au joueur :
         reponse = input("\nVotre réponse : ").lower().strip()
 
         if reponse == reponse_attendue:
@@ -313,6 +288,7 @@ class Actions:
             print("\n❌ Le code n'est pas bon, le coffre reste bloqué.")
             return False
         
+    # inspecter femme
     def femme(game):
         print("\nLa femme vous regarde mystérieusement...")
 
@@ -339,7 +315,7 @@ class Actions:
         else:
             print("Elle secoue la tête : « Je n’ai rien pour vous tant que vous ne m'apportez pas quelque chose de précieux… »")
     
-
+    # inspecter enfant
     def inspecter_enfant(game):
         print("\nL'enfant vous jette un regard noir....")
 
@@ -365,7 +341,7 @@ class Actions:
             print("Enfant retourne se coucher dans le lit.")
 
 
-
+    # inspecter tableau
     def inspecter_tableau(game):
         print("\nVous vous approchez du tableau poussiéreux...")
 
@@ -379,7 +355,7 @@ class Actions:
         else:
             print("La phrase semble écrite très petit... impossible de lire quoi que ce soit.")
 
-
+    # inspecter piano
     def inspecter_piano(game):
         print("\nVous ouvrez le couvercle du piano...")
 
@@ -391,35 +367,26 @@ class Actions:
         else:
             print("Le mécanisme ne semble pas réagir.")
 
+    # inspecter coffre clé
     def coffre_clé(game):
         print("\nCeci est un coffre maître, il est indiqué de gauche à droit les couleurs suivantes :")
         print("\ncoeur, pique, carreau, trèfle")
 
         reponse_attendue = "roi as 2 8"
 
-        # Pose la question au joueur :
+
         reponse = input("\nVotre réponse (en miniscule avec les espaces): ").lower().strip()
 
         if reponse == reponse_attendue:
             print("\n🎉Bien joué ! Vous arrivez bientôt à la fin !")
-            Actions.add_to_inventory(game, Item("clé maître", "un outil essentiel pour sortir du manoir", 2))
+            Actions.add_to_inventory(game, Item("clé_maître", "un outil essentiel pour sortir du manoir", 2))
             return True
         else:
             print("\n❌ Le coffre reste bloqué...")
             return False
     
-    #def ouvre_porte(game):
 
-        #inventory = game.player.inventory
-        #clé = 'clé maître'
-
-        # Vérifier si le joueur a la clé maître
-        #if clé in inventory:
-            #print(f"\n🎉 Félicitation {game.player.name} ! Vous avez réussi ! La porte s'ouvre lentement....Vous êtes maintenant en liberté ! Vive le python 🐍")
-            #return
-        #else:
-            #print("Il vous manque un objet précis pour sortir de ce manoir hanté.....va chercher ailleurs 👻 ")
-
+    # command history
     def history(game, list_of_words, number_of_parameters):
         """
         Display the list of all visited rooms.
@@ -451,10 +418,23 @@ class Actions:
         print()
         return True
     
+    # command inventory    
+    def get_inventory(game, list_of_words, number_of_parameters):
+        inventory = game.player.inventory
+        print("\nVous disposez des items suivants :")
+        
+        if not inventory:
+            print("Votre inventaire est vide.")
+        else:
+            for item in inventory.values():
+                print(f"  - {item}")
+    
+    # command look
     def look(game, words, nb):
         room = game.player.current_room
         room.get_inventory()
 
+    # command take
     def take(game, words, nb):
         if len(words) < 2:
             print("Prendre quoi ?")
@@ -480,7 +460,7 @@ class Actions:
         del current_room.inventory[item_name]  # Retirer l'objet de la pièce
         print(f"Vous avez pris l'objet '{item_name}'.")
             
-
+    # command drop
     def drop(game, words, nb):
         if len(words) < 2:
             print("Déposer quoi ?")
@@ -498,10 +478,11 @@ class Actions:
         else:
             print("Vous ne possédez pas cet objet.")
 
+    # command check
     def check(game, words, nb):
         inventory = game.player.inventory
 
-        print("\n🧰 Votre inventaire contient :")
+        print("\n Votre inventaire contient :")
 
         if not inventory:
             print("Il n'y a rien dans votre inventaire.")
@@ -509,6 +490,7 @@ class Actions:
             for item in inventory.values():
                 print(f"    - {item.name} : {item.description} ({item.weight} kg)")
 
+    # command talk
     def talk(game, words, nb):
         if len(words) < 2:
             print("Parler à qui ?")

@@ -6,7 +6,7 @@ class Player():
         self.name = name
         self.current_room = None
         self.inventory = {}
-        self.history = ["Hall"]  # Liste des pièces visitées, initialisée avec la pièce de départ
+        self.history = []  # Liste des pièces visitées, initialisée avec la pièce de départ
         self.max_weight = 10.0
         self.talked_to = []  # Liste des personnages déjà parlés
 
@@ -48,14 +48,14 @@ class Player():
             previous_room_name = self.history[-1]
             return previous_room_name
         return None
-    
+    # on calcule le poids total des items dans l'inventaire
     def get_current_weight(self):
         total_weight = 0.0
         for item in self.inventory.values():
             total_weight += item.weight
         return total_weight
 
-
+    # on vérifie si on a déjà parlé au PNJ
     def has_talked_to(self, pnj_name):
         return pnj_name in self.talked_to
 

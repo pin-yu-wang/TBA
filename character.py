@@ -41,7 +41,7 @@ class Character():
         return True
     
 
-    
+    # on récupère le message suivant du personnage
     def get_msg(self):
         if self.msgs:
             msg = self.msgs.pop(0)

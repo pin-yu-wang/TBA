@@ -9,32 +9,31 @@ from actions import Actions
 from item import Item
 from character import Character
 from config import DEBUG
-#from game import Game
 
 class Game:
     # Constructor
     def __init__(self):
         self.finished = False
         self.rooms = []
-        self.quests = {"item_quest": {
-            "completed": False,
-            "item": "clé maître",
-            "room": "Laboratoire"
-        },
-        "movement_quest": {
-            "completed": False,
-            "room": "Laboratoire"
-        },
-        "interaction_quest": {
-            "completed": False,
-            "pnj": "gardien"
-        }}
         self.commands = {}
         self.player = None
         self.item = []
+        self.quests = {"item_quest": {
+            "completed": False,
+            "item": "clé_maître",
+            "room": "Laboratoire"
+        },
+                        "movement_quest": {
+            "completed": False,
+            "room": "Laboratoire"
+        },
+                        "interaction_quest": {
+            "completed": False,
+            "pnj": "enfant"
+        }}
 
+# Assurer qu'un PNJ ne bouge qu'une seule fois par tour :
     def game_turn(self):
-        # Assurer qu'un PNJ ne bouge qu'une seule fois par tour :
         seen_ids = set()
         for room in self.rooms:
             for character in list(room.characters.values()):
@@ -85,15 +84,15 @@ class Game:
 
         Hall = Room("Hall", "actuellement dans le Hall, on constate qu'il y a des ecaliers qui mènent vers un étage supérieur.", None)
         self.rooms.append(Hall)
-        Salon = Room("Salon", "dans le Salon, plongé dans une pénombre frissonnante, était rempli de meubles anciens recouverts de draps poussiéreux. On constate la présence d'une femme et une échelle à côté d'elle qui mène vers l'étage au-dessus.", "femme")
+        Salon = Room("Salon", "dans le Salon, plongé dans une pénombre frissonnante, était rempli de meubles anciens recouverts de draps poussiéreux. On constate la présence d'une échelle à côté d'elle qui mène vers l'étage au-dessus.", None)
         self.rooms.append(Salon)
         Bibliothèque = Room("Bibliothèque", "dans la Bibliothèque, saturée d'un parfum de vieux parchemin, alignait ses étagères grinçantes dans une obscurité inquiétante. On observe un grimoire et un doudou au sol, et un mur gravé d'un langage ancien. Il y a une échelle qui vous mène vers l'étage en-dessous.", None)
         self.rooms.append(Bibliothèque)
-        Chambre = Room("Chambre", "dans la Chambre, figée dans une lueur blafarde, dévoilait un lit et des rideaux immobiles, sous le lit, il se trouve un coffre vérrouillé, et un enfant assis sur ce dernier, dans le coin de la pièce, vous observez des escaliers qui mènent vers un étage en-dessous.", "enfant")
+        Chambre = Room("Chambre", "dans la Chambre, figée dans une lueur blafarde, dévoilait un lit et des rideaux immobiles, sous le lit, il se trouve un coffre vérrouillé. Dans le coin de la pièce, vous observez des escaliers qui mènent vers un étage en-dessous.", None)
         self.rooms.append(Chambre)
         Salle_de_musique = Room("Salle_de_musique", "dans la Salle de musique, résonnait d'un silence oppressant, où un piano délaissé semblait attendre que les mains invisibles rejouent une mélodie oubliée, à coté du piano, il se trouve une ps5.", None)
         self.rooms.append(Salle_de_musique)
-        Bureau = Room("Bureau", "dans le Bureau, encombré de papiers jaunis et d'un large secrétaire craquant, baignait dans une atmosphère lourde, il y a un tableau poussiéreux sur le mur.", None)
+        Bureau = Room("Bureau", "dans le Bureau, encombré de papiers jaunis, baignait dans une atmosphère lourde, il y a un tableau poussiéreux sur le mur.", None)
         self.rooms.append(Bureau)
 
         Laboratoire = Room("Laboratoire", "dans le Laboratoire, déserté, rempli d’appareils silencieux et de fioles encore tièdes, semble figé au milieu d’une expérience interrompue. Il y a une porte verrouillée......", None)
@@ -102,8 +101,7 @@ class Game:
         self.rooms.append(Cuisine)
 
 
-
-        # Setup interactions and inventories for rooms
+        # Setup interactions, inventories and characters for rooms
         Hall.inventory = {"lettre": Item("lettre", "une lettre ancienne", 0.03)}
         Hall.interactions = {"enfant": Actions.inspecter_enfant,
                              "femme": Actions.femme}
@@ -147,9 +145,6 @@ class Game:
                                 "enfant": Actions.inspecter_enfant,
                                 "femme": Actions.femme}
         Cuisine.inventory = {"coffre_maître": Item("coffre_maître", "un coffre robuste nécessitant une clé spéciale", 30)}
-
-
-        #Laboratoire.inventory = {"porte": Item("porte","une porte verrouillée", 50)} 
 
 
 
@@ -213,10 +208,8 @@ class Game:
 
     def update_quests(self,player):
 
-        #game_running = True
-
         # Quête d'item : le joueur doit avoir la clé maître dans le laboratoire
-        if player.current_room.name == "Laboratoire" and "clé maître" in player.inventory:
+        if player.current_room.name == "Laboratoire" and "clé_maître" in player.inventory:
             self.quests["item_quest"]["completed"] = True
 
         # Quête de déplacement : atteindre le laboratoire
@@ -228,7 +221,7 @@ class Game:
             self.quests["interaction_quest"]["completed"] = True
         # Vérifier les conditions de défaite
         if self.loose(player):
-            print(f"\n💀 Dommage {player.name}... Vous êtes entré dans le laboratoire sans la clé maître. Vous restez prisonnier.....vous avez perdu le jeu.\n")
+            print(f"\n Dommage {player.name}... Vous êtes entré(e) dans le laboratoire sans la clé_maître. Vous restez prisonnier.....vous avez perdu le jeu.\n")
             self.finished = True
             return
         # Vérifier les conditions de victoire
@@ -239,11 +232,11 @@ class Game:
 
     # le joueur gagne s'il complète toutes les quêtes
     def win(self):
-        return all(quest["completed"] for quest in self.quests.values())
+        return all(quest["completed"] for quest in self.quests.values())  # all() est une fonction qui retourne True si tous les éléments d'un itérable sont vrais
 
     # le joueur perd s'il entre dans le laboratoire sans avoir la clé maître
     def loose(self,player):
-        if player.current_room.name == "Laboratoire" and 'clé maître' not in player.inventory:
+        if player.current_room.name == "Laboratoire" and 'clé_maître' not in player.inventory:
             return True
         return False
        

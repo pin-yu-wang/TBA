@@ -12,16 +12,16 @@ class Room:
         self.inventory = {}     # objets
         self.characters =  {}        #PNJ
     
-    # Define the get_exit method.
+    # Define the get_exit method
     def get_exit(self, direction):
 
-        # Return the room in the given direction if it exists.
+        # Return the room in the given direction if it exists
         if direction in self.exits.keys():
             return self.exits[direction]
         else:
             return None
     
-    # Return a string describing the room's exits.
+    # Return a string describing the room's exits
     def get_exit_string(self):
         exit_string = "Sorties: " 
         for exit in self.exits.keys():
@@ -30,7 +30,7 @@ class Room:
         exit_string = exit_string.strip(", ")
         return exit_string
 
-    # Return a long description of this room including exits.
+    # Return a long description of this room including exits
     def get_long_description(self):
         return f"\nVous êtes {self.description}\n\n{self.get_exit_string()}\n"
     

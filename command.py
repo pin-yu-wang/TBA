@@ -42,8 +42,8 @@ class Command:
         return  self.command_word \
                 + self.help_string
 
-
-def parse_command(game, command):
+# The function to parse a command.
+def parse_command(game, command): 
     words = command.lower().split()
     if not words:
         return
